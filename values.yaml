@@ -1,0 +1,23 @@
+# Default values for wcv9.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Common configuration for all component docker 
+Common:
+  ReplicaCount: 1
+  Cpu: 0.5m
+  Memory: 2048Mi
+  Tenant: coppel
+  Environment_name: qa
+  Image_repo: registry:5000/util/
+  Namespace: default
+Kafka:
+  Name: kafka-app
+  Replica: 1
+  Image: kafka
+  Tag: "1.0"
+Zookeeper:
+  Name: zookeeper-app
+  Replica: 1
+  Image: zookeeper
+  Tag: "1.0"
