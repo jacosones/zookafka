@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Kafka.Name}}
+  namespace: {{ .Values.Common.Namespace }}
+  labels:
+    app: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Kafka.Name}}
+spec:
+  replicas: {{.Values.Kafka.Replica}}
+  selector:
+    matchLabels:
+      app: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Kafka.Name}}
+  template:
+    metadata:
+      labels:
+        component: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Kafka.Name}}
+        group: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}
+        app: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Kafka.Name}}
+    spec:
+      containers:
+      - name: kafka-app
+        image: "{{ .Values.Common.Image_repo }}{{ .Values.Kafka.Image }}:{{ .Values.Kafka.Tag }}"
+        resources:
+          requests:
+            cpu: 0.5m
+            memory: 1024Mi
+          limits:
+            cpu: 1
+            memory: 2048Mi
+        env:
+        - name: "ZOOKEEPER_IP"
+          value: "{{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Zookeeper.Name}}"
+        - name: "KAFKA_ADVERTISED_HOST_NAME"
+          value: "{{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Kafka.Name}}"
+        ports:
+        - containerPort: 9092
+          name: serverkafka
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name:  {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Kafka.Name}}
+  labels:
+    component: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Kafka.Name}}
+    group: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}
+  namespace: {{ .Values.Common.Namespace }}
+spec:
+  ports:
+  - port: 9092
+    name: port9092
+  selector:
+    component: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Kafka.Name}}
