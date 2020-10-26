@@ -15,9 +15,9 @@ Kafka:
   Name: kafka-app
   Replica: 1
   Image: kafka
-  Tag: "1.0"
+  Tag: "latest"
 Zookeeper:
   Name: zookeeper-app
   Replica: 1
   Image: zookeeper
-  Tag: "1.0"
+  Tag: "latest"
