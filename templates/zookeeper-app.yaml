@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Zookeeper.Name}}
+  namespace: {{ .Values.Common.Namespace }}
+  labels:
+    app: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Zookeeper.Name}}
+spec:
+  replicas: {{ .Values.Zookeeper.Replica }}
+  selector:
+    matchLabels:
+      app: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Zookeeper.Name}}
+  template:
+    metadata:
+      labels:
+        component: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Zookeeper.Name}}
+        group: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}
+        app: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Zookeeper.Name}}
+    spec:
+      containers:
+      - name: zookeeper-app
+        image: "{{ .Values.Common.Image_repo }}{{ .Values.Zookeeper.Image }}:{{ .Values.Zookeeper.Tag }}"
+        resources:
+          requests:
+            cpu: 0.5m
+            memory: 1024Mi
+          limits:
+            cpu: 1
+            memory: 2048Mi
+        env:
+        - name: "ZOO_MY_ID"
+          value: "1"
+        - name: "ZOO_SERVERS"
+          value: "server.1=0.0.0.0:2888:3888"
+        ports:
+        - containerPort: 2181
+          name: clientzook
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name:  {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Zookeeper.Name}}
+  labels:
+    component: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Zookeeper.Name}}
+    group: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}
+  namespace: {{ .Values.Common.Namespace }}
+spec:
+  ports:
+  - port: 2181
+    name: port2181
+  selector:
+    component: {{ .Values.Common.Tenant }}{{ .Values.Common.Environment_name}}{{.Values.Zookeeper.Name}}
